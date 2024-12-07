@@ -1,0 +1,9 @@
+﻿@model SchoolDatabaseMVP.Models.Teacher
+
+<h2>Are you sure you want to delete @Model.Name?</h2>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="TeacherId" />
+    <button type="submit">Yes, Delete</button>
+    <a href="/">Cancel</a>
+</form>
