@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SchoolDatabaseMVP.Models;
 
 public class TeacherPageController : Controller
@@ -10,44 +11,48 @@ public class TeacherPageController : Controller
         _context = context;
     }
 
+    // GET: /Teacher/Edit/5
     [HttpGet]
-    public IActionResult New()
-    {
-        return View();
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> New(Teacher teacher)
-    {
-        if (!ModelState.IsValid)
-            return View(teacher);
-
-        await _context.Teachers.AddAsync(teacher);
-        await _context.SaveChangesAsync();
-
-        return RedirectToAction("Index");
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> DeleteConfirm(int id)
+    public async Task<IActionResult> Edit(int id)
     {
         var teacher = await _context.Teachers.FindAsync(id);
         if (teacher == null)
+        {
             return NotFound();
-
+        }
         return View(teacher);
     }
 
+    // POST: /Teacher/Edit/5
     [HttpPost]
-    public async Task<IActionResult> DeleteConfirmed(int id)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, Teacher teacher)
     {
-        var teacher = await _context.Teachers.FindAsync(id);
-        if (teacher == null)
-            return NotFound();
+        if (id != teacher.TeacherId)
+        {
+            return BadRequest();
+        }
 
-        _context.Teachers.Remove(teacher);
-        await _context.SaveChangesAsync();
-
-        return RedirectToAction("Index");
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                _context.Update(teacher);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Teachers.Any(e => e.TeacherId == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));  // Or wherever you'd like to redirect
+        }
+        return View(teacher);
     }
 }

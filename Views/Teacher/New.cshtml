@@ -1,11 +1,23 @@
-﻿@model SchoolDatabaseMVP.Models.Teacher
+﻿@using SchoolDatabaseMVP.Models
+@model SchoolDatabaseMVP.Models.Teacher
+
 
 <form asp-action="New" method="post">
-    <label>Name</label>
-    <input asp-for="Name" />
+    <label>First Name</label>
+    <input asp-for="TeacherFname" />
+
+    <label>Last Name</label>
+    <input asp-for="TeacherLname" />
+
     <label>Hire Date</label>
     <input asp-for="HireDate" type="date" />
+
     <label>Employee Number</label>
     <input asp-for="EmployeeNumber" />
+
+    <label>Salary</label>
+    <input asp-for="Salary" type="number" step="0.01" />
+
     <button type="submit">Add Teacher</button>
 </form>
+

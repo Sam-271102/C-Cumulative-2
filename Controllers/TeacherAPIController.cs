@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SchoolDatabaseMVP.Models;
 
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 public class TeacherAPIController : ControllerBase
 {
     private readonly SchoolDbContext _context;
@@ -12,29 +13,44 @@ public class TeacherAPIController : ControllerBase
         _context = context;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> AddTeacher([FromBody] Teacher teacher)
+    // PUT: api/TeacherAPI/5
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateTeacher(int id, Teacher teacher)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
+        if (id != teacher.TeacherId)
+        {
+            return BadRequest("Teacher ID mismatch.");
+        }
 
-        await _context.Teachers.AddAsync(teacher);
-        await _context.SaveChangesAsync();
+        var existingTeacher = await _context.Teachers.FindAsync(id);
+        if (existingTeacher == null)
+        {
+            return NotFound("Teacher not found.");
+        }
 
-        return Ok(teacher);
-    }
+        // Update the teacher fields
+        existingTeacher.TeacherFname = teacher.TeacherFname;
+        existingTeacher.TeacherLname = teacher.TeacherLname;
+        existingTeacher.EmployeeNumber = teacher.EmployeeNumber;
+        existingTeacher.HireDate = teacher.HireDate;
+        existingTeacher.Salary = teacher.Salary;
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTeacher(int id)
-    {
-        var teacher = await _context.Teachers.FindAsync(id);
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!_context.Teachers.Any(e => e.TeacherId == id))
+            {
+                return NotFound("Teacher not found.");
+            }
+            else
+            {
+                throw;
+            }
+        }
 
-        if (teacher == null)
-            return NotFound(new { Message = "Teacher not found." });
-
-        _context.Teachers.Remove(teacher);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { Message = "Teacher deleted successfully." });
+        return NoContent();  // Successfully updated
     }
 }

@@ -1,21 +1,13 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-
-namespace SchoolDatabaseMVP.Models
+﻿namespace SchoolDatabaseMVP.Models
+  
 {
     public class Teacher
     {
         public int TeacherId { get; set; }
-
-        [Required]
-        public string Name { get; set; }
-
-        [Required]
-        [DataType(DataType.Date)]
-        public DateTime HireDate { get; set; }
-
-        [Required]
-        [RegularExpression(@"^T\d+$", ErrorMessage = "Employee Number must start with 'T' followed by digits.")]
+        public string TeacherFname { get; set; }
+        public string TeacherLname { get; set; }
         public string EmployeeNumber { get; set; }
+        public DateTime HireDate { get; set; }
+        public double Salary { get; set; }
     }
 }
